@@ -13,7 +13,7 @@ function positiveIntFromEnv(name, fallback) {
 const scid = '4fc10100-5f7a-4470-899b-280835760c07';
 
 const config = {
-  host: process.env.HOST || '127.0.0.1',
+  host: process.env.HOST || '0.0.0.0',
   port: intFromEnv('PORT', 3000),
 
   cacheRoot: path.resolve(process.env.AUTH_CACHE_ROOT || path.join(__dirname, '..', 'auth-cache')),
