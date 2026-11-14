@@ -1,0 +1,66 @@
+{
+  "results": [
+    {
+      "id": "h-survival",
+      "ownerXuid": "2535400000000002",
+      "sessionRef": {
+        "scid": "4fc10100-5f7a-4470-899b-280835760c07",
+        "templateName": "MinecraftLobby",
+        "name": "sess-survival"
+      },
+      "relatedInfo": {
+        "membersCount": 3,
+        "maxMembersCount": 8,
+        "joinRestriction": "followed",
+        "visibility": "friends",
+        "closed": false
+      },
+      "customProperties": "{\"hostName\":\"Alex\",\"worldName\":\"Survival Realm\",\"version\":\"1.21.60\",\"MemberCount\":3,\"MaxMemberCount\":8,\"Joinability\":\"FriendsOnly\",\"SupportedConnections\":[{\"ConnectionType\":7,\"NetherNetId\":15778080650974306186,\"PmsgId\":\"a1b2c3\"}]}"
+    },
+    {
+      "id": "h-creative",
+      "ownerXuid": "2535400000000003",
+      "sessionRef": {
+        "scid": "4fc10100-5f7a-4470-899b-280835760c07",
+        "templateName": "MinecraftLobby",
+        "name": "sess-creative"
+      },
+      "relatedInfo": {
+        "membersCount": 2,
+        "maxMembersCount": 10,
+        "joinRestriction": "invited",
+        "visibility": "friends",
+        "closed": false
+      },
+      "customProperties": "{\"hostName\":\"Steve\",\"worldName\":\"Creative Build\",\"version\":\"1.21.50\",\"MemberCount\":2,\"MaxMemberCount\":10,\"Joinability\":\"InviteOnly\",\"SupportedConnections\":[{\"ConnectionType\":1,\"WebRTCNetworkId\":\"webrtc-9f8e7d\",\"PmsgId\":\"d4e5f6\"}]}"
+    },
+    {
+      "id": "h-other-template",
+      "ownerXuid": "2535400000000004",
+      "sessionRef": {
+        "scid": "4fc10100-5f7a-4470-899b-280835760c07",
+        "templateName": "MinecraftLobbyPreview",
+        "name": "sess-preview"
+      },
+      "relatedInfo": {},
+      "customProperties": "{\"hostName\":\"Notch\",\"worldName\":\"Preview\",\"SupportedConnections\":[{\"ConnectionType\":7,\"NetherNetId\":99}]}"
+    },
+    {
+      "id": "h-empty",
+      "ownerXuid": "2535400000000005",
+      "sessionRef": {
+        "scid": "4fc10100-5f7a-4470-899b-280835760c07",
+        "templateName": "MinecraftLobby",
+        "name": "sess-empty"
+      },
+      "relatedInfo": {
+        "membersCount": 1,
+        "maxMembersCount": 20,
+        "joinRestriction": "anyone",
+        "visibility": "public",
+        "closed": false
+      },
+      "customProperties": "{\"hostName\":\"Herobrine\",\"worldName\":\"Empty World\"}"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Xbox 好友世界</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Xbox 好友世界</div>
+    <div class="account-bar" id="account-bar" hidden>
+      <span id="account-name" class="account-name"></span>
+      <button id="refresh-button" type="button">重新整理</button>
+      <button id="logout-button" type="button" class="secondary">登出</button>
+      <button id="delete-account-button" type="button" class="secondary danger">註銷帳號</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="login-view" class="panel" hidden>
+      <h1>登入 Xbox</h1>
+      <p class="muted">訪客可以直接瀏覽下方房間列表；登入後即可發送邀請。使用 Microsoft 裝置碼登入，完成後此瀏覽器會保持登入 12 小時。</p>
+      <button id="login-button" type="button">取得裝置碼</button>
+      <div id="device-code-box" hidden>
+        <p>1. 開啟 <a id="verify-link" href="https://www.microsoft.com/link" target="_blank" rel="noopener noreferrer">Microsoft 裝置登入頁面</a></p>
+        <p>2. 輸入裝置碼 <code id="user-code" class="user-code"></code></p>
+      </div>
+      <p id="login-status" class="status" role="status"></p>
+    </section>
+
+    <section id="rooms-view" hidden>
+      <div id="rooms" class="rooms"></div>
+    </section>
+
+    <p id="error-banner" class="error-banner" role="alert" hidden></p>
+  </main>
+
+  <footer class="muted">僅在本機執行，登入資訊不會離開此伺服器。</footer>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>

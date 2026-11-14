@@ -1,0 +1,79 @@
+{
+  "membersInfo": {
+    "first": 0,
+    "next": 4,
+    "count": 4,
+    "accepted": 3,
+    "active": 2
+  },
+  "members": {
+    "0": {
+      "next": 1,
+      "joinTime": "2026-11-14T10:00:00.000Z",
+      "constants": {
+        "system": {
+          "xuid": "2535400000000002"
+        }
+      },
+      "properties": {
+        "system": {
+          "active": true
+        }
+      },
+      "gamertag": "Alex",
+      "activeTitleId": "00000000441cc96b",
+      "reserved": false
+    },
+    "1": {
+      "next": 2,
+      "joinTime": "2026-11-14T10:04:00.000Z",
+      "constants": {
+        "system": {
+          "xuid": "2535400000000003"
+        }
+      },
+      "properties": {
+        "system": {
+          "active": false
+        }
+      },
+      "gamertag": "Steve",
+      "activeTitleId": "00000000441cc96b",
+      "reserved": false
+    },
+    "2": {
+      "next": 3,
+      "joinTime": "2026-11-14T10:05:00.000Z",
+      "constants": {
+        "system": {
+          "xuid": "2535400000000005"
+        }
+      },
+      "properties": {
+        "system": {
+          "active": false
+        }
+      },
+      "gamertag": "Invited",
+      "activeTitleId": "00000000441cc96b",
+      "reserved": true
+    },
+    "3": {
+      "next": 4,
+      "joinTime": "2026-11-14T10:06:00.000Z",
+      "constants": {
+        "system": {
+          "xuid": "2535400000000004"
+        }
+      },
+      "properties": {
+        "system": {
+          "active": true
+        }
+      },
+      "gamertag": "BlueBoot",
+      "activeTitleId": "00000000441cc96b",
+      "reserved": false
+    }
+  }
+}

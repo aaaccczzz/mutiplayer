@@ -1,0 +1,21 @@
+{
+  "name": "xbox-friend-rooms",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Xbox friend world session signal viewer",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test",
+    "check": "node --check server.js && node --check src/config.js && node --check src/xboxApi.js && node --check src/discovery.js && node --check src/auth.js && node --check src/members.js && node --check src/rooms.js && node --check src/roomRefresher.js && node --check src/routes.js && node --check src/stateStore.js && node --check public/app.js"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "json-bigint": "^1.0.0",
+    "prismarine-auth": "^3.1.1"
+  }
+}
