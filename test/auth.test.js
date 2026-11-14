@@ -9,6 +9,20 @@ const { AuthManager } = require('../src/auth');
 
 const silentLogger = { log() {}, warn() {} };
 
+function createMemoryStateStore() {
+  return {
+    accounts: [],
+    async getAccounts() {
+      return this.accounts;
+    },
+    setAccounts(accounts) {
+      this.accounts = accounts;
+    },
+    async flush() {},
+    async close() {}
+  };
+}
+
 test('AuthManager 使用 live flow 與 Nintendo 裝置類型開始登入', async () => {
   const cacheRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'xbox-auth-test-'));
   const testConfig = { ...config, cacheRoot, deviceCodeWaitMs: 1000 };
@@ -16,6 +30,7 @@ test('AuthManager 使用 live flow 與 Nintendo 裝置類型開始登入', async
 
   const auth = new AuthManager(testConfig, {
     logger: silentLogger,
+    stateStore: createMemoryStateStore(),
     authflowFactory(username, cacheDir, options, onCode) {
       captured = { username, cacheDir, options };
       onCode({
@@ -50,11 +65,10 @@ test('AuthManager 使用 live flow 與 Nintendo 裝置類型開始登入', async
   }
 });
 
-test('AuthManager 從狀態檔還原帳號', async () => {
+test('AuthManager 從狀態儲存庫還原帳號', async () => {
   const cacheRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'xbox-auth-restore-test-'));
   const cacheDir = path.join(cacheRoot, 'account-restored');
   fs.mkdirSync(cacheDir, { recursive: true });
-  const statePath = path.join(cacheRoot, 'state.json');
   const savedAccount = {
     id: 'restored-account',
     username: 'restored-login',
@@ -67,13 +81,15 @@ test('AuthManager 從狀態檔還原帳號', async () => {
     lastError: null,
     sessions: [{ sessionName: 'sess-1' }]
   };
-  fs.writeFileSync(statePath, JSON.stringify({ version: 1, accounts: [savedAccount] }));
+  const stateStore = createMemoryStateStore();
+  stateStore.accounts = [savedAccount];
 
   let created = null;
   const auth = new AuthManager(
-    { ...config, cacheRoot, statePath },
+    { ...config, cacheRoot },
     {
       logger: silentLogger,
+      stateStore,
       authflowFactory(username, dir) {
         created = { username, dir };
         return {
@@ -88,6 +104,8 @@ test('AuthManager 從狀態檔還原帳號', async () => {
   );
 
   try {
+    await auth.init();
+
     assert.equal(auth.listAccounts().length, 1);
     const restored = auth.getAccount(savedAccount.id);
     assert.equal(restored.username, savedAccount.username);

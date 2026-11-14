@@ -19,6 +19,8 @@ const config = {
   cacheRoot: path.resolve(process.env.AUTH_CACHE_ROOT || path.join(__dirname, '..', 'auth-cache')),
   publicDir: path.resolve(__dirname, '..', 'public'),
   statePath: path.resolve(process.env.STATE_PATH || path.join(__dirname, '..', 'data', 'state.json')),
+  databaseUrl: process.env.DATABASE_URL ||
+    'postgresql://mutiplayer_data_user:W3grCAPa3gZXnhorkCj3eEJ5UhiVYjtc@dpg-dbs49d3rjlhs73d4d3l0-a/mutiplayer_data',
 
   bedrockTitleId: '00000000441cc96b',
   authFlow: process.env.AUTH_FLOW || 'live',

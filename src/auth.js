@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { Authflow } = require('prismarine-auth');
 const { createXboxApi } = require('./xboxApi');
-const { StateStore } = require('./stateStore');
+const { PostgresStateStore } = require('./postgresStateStore');
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -56,16 +56,22 @@ function removeDir(dir) {
 }
 
 class AuthManager {
-  constructor(config, { logger = console, authflowFactory } = {}) {
+  constructor(config, { logger = console, authflowFactory, stateStore } = {}) {
     this.config = config;
     this.logger = logger;
     this.logins = new Map();
     this.accounts = new Map();
     this.authflowFactory = authflowFactory || ((username, cacheDir, options, onCode) =>
       new Authflow(username, cacheDir, options, onCode));
-    this.stateStore = new StateStore(this.config.statePath, { logger: this.logger });
+    this.stateStore = stateStore || new PostgresStateStore(this.config.databaseUrl, {
+      logger: this.logger,
+      legacyStatePath: this.config.statePath
+    });
     fs.mkdirSync(this.config.cacheRoot, { recursive: true });
-    this.restoreAccounts();
+  }
+
+  async init() {
+    await this.restoreAccounts();
   }
 
   async startLogin() {
@@ -207,8 +213,8 @@ class AuthManager {
     return account;
   }
 
-  restoreAccounts() {
-    const entries = this.stateStore.getAccounts() || [];
+  async restoreAccounts() {
+    const entries = (await this.stateStore.getAccounts()) || [];
     let restored = 0;
 
     for (const entry of entries) {
@@ -340,7 +346,7 @@ class AuthManager {
     await Promise.all(tasks);
 
     this.saveState();
-    await this.stateStore.flush();
+    await this.stateStore.close();
   }
 }
 
