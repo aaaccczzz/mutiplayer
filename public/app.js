@@ -4,6 +4,7 @@
   const elements = {
     accountBar: document.getElementById('account-bar'),
     accountName: document.getElementById('account-name'),
+    broadcastToggle: document.getElementById('broadcast-toggle'),
     refreshButton: document.getElementById('refresh-button'),
     logoutButton: document.getElementById('logout-button'),
     deleteAccountButton: document.getElementById('delete-account-button'),
@@ -24,7 +25,7 @@
     'host-missing': '主機不在玩家名單',
     'count-mismatch': '回報人數與玩家名單不符'
   };
-  const state = { loggedIn: false, profile: null, showUntrusted: false };
+  const state = { loggedIn: false, profile: null, broadcastEnabled: false, showUntrusted: false };
   let lastRoomsData = null;
   let loginPollTimer = null;
   let autoRefreshTimer = null;
@@ -457,11 +458,36 @@
     startAutoRefresh();
   }
 
+  function updateBroadcastToggle(enabled) {
+    state.broadcastEnabled = enabled;
+    elements.broadcastToggle.textContent = enabled ? '廣播好友房間：開' : '廣播好友房間：關';
+    elements.broadcastToggle.classList.toggle('on', enabled);
+  }
+
+  async function toggleBroadcast() {
+    const next = !state.broadcastEnabled;
+    elements.broadcastToggle.disabled = true;
+    try {
+      const data = await api('/api/me/broadcast', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ enabled: next })
+      });
+      updateBroadcastToggle(Boolean(data.broadcastEnabled));
+      loadRooms().catch(() => {});
+    } catch (error) {
+      showError(error.message);
+    } finally {
+      elements.broadcastToggle.disabled = false;
+    }
+  }
+
   function showLoggedIn(profile) {
     stopAutoRefresh();
     state.loggedIn = true;
     state.profile = profile;
     elements.accountName.textContent = profile.gamertag || profile.xuid || '已登入';
+    updateBroadcastToggle(profile.broadcastEnabled === true);
     elements.accountBar.hidden = false;
     elements.loginView.hidden = true;
     elements.roomsView.hidden = false;
@@ -592,6 +618,7 @@
   }
 
   elements.loginButton.addEventListener('click', startLogin);
+  elements.broadcastToggle.addEventListener('click', toggleBroadcast);
   elements.refreshButton.addEventListener('click', refresh);
   elements.logoutButton.addEventListener('click', logout);
   elements.deleteAccountButton.addEventListener('click', deleteAccount);

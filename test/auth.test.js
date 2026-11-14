@@ -76,6 +76,7 @@ test('AuthManager 從狀態儲存庫還原帳號', async () => {
     profile: { xuid: '2535400000000001', gamertag: 'Restored' },
     createdAt: 1,
     lastSeenAt: 2,
+    broadcastEnabled: true,
     discoveredAt: 3,
     lastRefreshAt: 4,
     lastError: null,
@@ -110,14 +111,54 @@ test('AuthManager 從狀態儲存庫還原帳號', async () => {
     const restored = auth.getAccount(savedAccount.id);
     assert.equal(restored.username, savedAccount.username);
     assert.equal(restored.profile.gamertag, savedAccount.profile.gamertag);
+    assert.equal(restored.broadcastEnabled, true);
     assert.equal(restored.sessions[0].sessionName, savedAccount.sessions[0].sessionName);
     assert.ok(created);
     assert.equal(created.username, savedAccount.username);
     assert.equal(created.dir, cacheDir);
 
+    auth.setBroadcastEnabled(savedAccount.id, false);
+    assert.equal(auth.getAccount(savedAccount.id).broadcastEnabled, false);
+    assert.deepEqual(stateStore.accounts.map((account) => account.broadcastEnabled), [false]);
+
+    auth.setBroadcastEnabled(savedAccount.id, true);
+    assert.deepEqual(stateStore.accounts.map((account) => account.broadcastEnabled), [true]);
+
     await auth.shutdown();
     assert.ok(fs.existsSync(cacheDir));
   } finally {
+    fs.rmSync(cacheRoot, { recursive: true, force: true });
+  }
+});
+
+test('舊資料缺少 broadcastEnabled 時預設為關閉', async () => {
+  const cacheRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'xbox-auth-default-test-'));
+  const cacheDir = path.join(cacheRoot, 'account-legacy');
+  fs.mkdirSync(cacheDir, { recursive: true });
+  const stateStore = createMemoryStateStore();
+  stateStore.accounts = [{
+    id: 'legacy-account',
+    username: 'legacy-login',
+    cacheDir,
+    profile: { xuid: '2535400000000009', gamertag: 'Legacy' }
+  }];
+
+  const auth = new AuthManager(
+    { ...config, cacheRoot },
+    {
+      logger: silentLogger,
+      stateStore,
+      authflowFactory() {
+        return { getXboxToken: async () => ({ userXUID: '2535400000000009' }) };
+      }
+    }
+  );
+
+  try {
+    await auth.init();
+    assert.equal(auth.getAccount('legacy-account').broadcastEnabled, false);
+  } finally {
+    await auth.shutdown();
     fs.rmSync(cacheRoot, { recursive: true, force: true });
   }
 });

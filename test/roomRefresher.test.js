@@ -10,10 +10,10 @@ const testConfig = {
   refreshAccountsConcurrency: 2
 };
 
-test('RoomRefresher.run 更新所有帳號', async () => {
+test('RoomRefresher.run 更新所有廣播帳號', async () => {
   const accounts = [
-    { id: 'a', sessions: [{ sessionName: 's1', members: [{ xuid: '1' }] }] },
-    { id: 'b', sessions: [] }
+    { id: 'a', broadcastEnabled: true, sessions: [{ sessionName: 's1', members: [{ xuid: '1' }] }] },
+    { id: 'b', broadcastEnabled: true, sessions: [] }
   ];
   let received = null;
 
@@ -29,12 +29,54 @@ test('RoomRefresher.run 更新所有帳號', async () => {
 
   const result = await refresher.run();
 
-  assert.equal(received.targets, accounts);
+  assert.deepEqual(received.targets.map((account) => account.id), ['a', 'b']);
   assert.equal(received.options.config, testConfig);
   assert.equal(received.options.concurrency, 2);
   assert.equal(result.skipped, false);
   assert.equal(result.results.length, 2);
   assert.ok(refresher.lastRunAt > 0);
+});
+
+test('RoomRefresher.run 略過未開啟廣播的帳號', async () => {
+  let received = null;
+
+  const refresher = new RoomRefresher({
+    auth: {
+      listAccounts: () => [
+        { id: 'off', sessions: [{ sessionName: 's1' }] },
+        { id: 'on', broadcastEnabled: true, sessions: [] }
+      ]
+    },
+    config: testConfig,
+    logger: silentLogger,
+    refreshAll: async (targets) => {
+      received = targets;
+      return targets.map((account) => ({ account, ok: true }));
+    }
+  });
+
+  const result = await refresher.run();
+
+  assert.equal(result.skipped, false);
+  assert.deepEqual(received.map((account) => account.id), ['on']);
+});
+
+test('RoomRefresher.run 全部未廣播時跳過 API', async () => {
+  let called = false;
+  const refresher = new RoomRefresher({
+    auth: { listAccounts: () => [{ id: 'off', sessions: [] }] },
+    config: testConfig,
+    logger: silentLogger,
+    refreshAll: async () => {
+      called = true;
+      return [];
+    }
+  });
+
+  const result = await refresher.run();
+
+  assert.equal(result.skipped, true);
+  assert.equal(called, false);
 });
 
 test('RoomRefresher.run 合併重疊的更新', async () => {
@@ -43,7 +85,7 @@ test('RoomRefresher.run 合併重疊的更新', async () => {
   const gate = new Promise((resolve) => { release = resolve; });
 
   const refresher = new RoomRefresher({
-    auth: { listAccounts: () => [{ id: 'a', sessions: [] }] },
+    auth: { listAccounts: () => [{ id: 'a', broadcastEnabled: true, sessions: [] }] },
     config: testConfig,
     logger: silentLogger,
     refreshAll: async (targets) => {
@@ -59,24 +101,6 @@ test('RoomRefresher.run 合併重疊的更新', async () => {
   await Promise.all([first, second]);
 
   assert.equal(calls, 1);
-});
-
-test('RoomRefresher.run 沒有帳號時跳過 API', async () => {
-  let called = false;
-  const refresher = new RoomRefresher({
-    auth: { listAccounts: () => [] },
-    config: testConfig,
-    logger: silentLogger,
-    refreshAll: async () => {
-      called = true;
-      return [];
-    }
-  });
-
-  const result = await refresher.run();
-
-  assert.equal(result.skipped, true);
-  assert.equal(called, false);
 });
 
 test('RoomRefresher.warmAccount 使用該帳號的 API 立即更新', async () => {

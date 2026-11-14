@@ -80,6 +80,10 @@ function createRouter({ auth, config, logger = console, refresher }) {
   const router = express.Router();
   const requireLogin = requireAccount(auth);
 
+  function broadcastAccounts() {
+    return auth.listAccounts().filter((account) => account.broadcastEnabled === true);
+  }
+
   router.use((req, res, next) => {
     res.set('Cache-Control', 'no-store');
     next();
@@ -128,12 +132,22 @@ function createRouter({ auth, config, logger = console, refresher }) {
   router.get('/me', requireLogin, (req, res) => {
     res.json({
       gamertag: req.account.profile?.gamertag || null,
-      xuid: req.account.profile?.xuid || null
+      xuid: req.account.profile?.xuid || null,
+      broadcastEnabled: req.account.broadcastEnabled === true
     });
   });
 
+  router.post('/me/broadcast', requireLogin, (req, res) => {
+    const enabled = req.body?.enabled === true;
+    auth.setBroadcastEnabled(req.account.id, enabled);
+    if (enabled && refresher) {
+      refresher.warmAccount(req.account).catch(() => {});
+    }
+    res.json({ ok: true, broadcastEnabled: enabled });
+  });
+
   router.get('/rooms', (req, res) => {
-    const accounts = auth.listAccounts();
+    const accounts = broadcastAccounts();
 
     res.json({
       rooms: getMergedRoomsPayload(accounts, config),
@@ -153,8 +167,7 @@ function createRouter({ auth, config, logger = console, refresher }) {
     }
     req.account.lastRefreshAt = now;
 
-    const accounts = auth.listAccounts();
-    const targets = accounts.length > 0 ? accounts : [req.account];
+    const targets = broadcastAccounts();
     const results = await refreshAccounts(targets, { config, logger });
     auth.saveState?.();
     const failures = results
@@ -198,7 +211,7 @@ function createRouter({ auth, config, logger = console, refresher }) {
       return res.status(400).json({ error: 'XUID 或 gamertag 格式無效' });
     }
 
-    const accounts = auth.listAccounts();
+    const accounts = broadcastAccounts();
     const requestedSenderId = typeof req.body?.accountId === 'string' ? req.body.accountId.trim() : '';
     const sender = (requestedSenderId && accounts.find((account) => account.id === requestedSenderId))
       || accounts[0];

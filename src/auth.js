@@ -203,6 +203,7 @@ class AuthManager {
       profile: login.profile,
       createdAt: Date.now(),
       lastSeenAt: Date.now(),
+      broadcastEnabled: false,
       sessions: [],
       discoveredAt: null,
       discovering: null,
@@ -244,6 +245,7 @@ class AuthManager {
           profile: entry.profile || null,
           createdAt: entry.createdAt || Date.now(),
           lastSeenAt: Date.now(),
+          broadcastEnabled: entry.broadcastEnabled === true,
           sessions: Array.isArray(entry.sessions) ? entry.sessions : [],
           discoveredAt: entry.discoveredAt || null,
           discovering: null,
@@ -298,6 +300,15 @@ class AuthManager {
     removeDir(account.cacheDir);
     this.saveState();
     this.logger.log(`[auth] 移除帳號 ${account.profile?.gamertag || accountId}`);
+  }
+
+  setBroadcastEnabled(accountId, enabled) {
+    const account = this.accounts.get(accountId);
+    if (!account) return null;
+    account.broadcastEnabled = enabled === true;
+    this.saveState();
+    this.logger.log(`[auth] ${account.profile?.gamertag || accountId} 廣播${account.broadcastEnabled ? '開啟' : '關閉'}`);
+    return account;
   }
 
   listAccounts() {

@@ -14,6 +14,7 @@ function serializeAccount(account) {
     profile: account.profile || null,
     createdAt: account.createdAt || null,
     lastSeenAt: account.lastSeenAt || null,
+    broadcastEnabled: account.broadcastEnabled === true,
     discoveredAt: account.discoveredAt || null,
     lastRefreshAt: account.lastRefreshAt || 0,
     lastError: account.lastError || null,

@@ -49,6 +49,7 @@ function makeAccount(overrides = {}) {
     profile: { xuid: '2535400000000001', gamertag: 'Me' },
     createdAt: 1,
     lastSeenAt: 2,
+    broadcastEnabled: true,
     discoveredAt: 3,
     lastRefreshAt: 4,
     lastError: null,
@@ -70,6 +71,7 @@ test('有變動就立即寫入 PostgreSQL', async () => {
   const data = JSON.parse(inserts[0].params[1]);
   assert.equal(data.accounts.length, 1);
   assert.equal(data.accounts[0].id, 'account-1');
+  assert.equal(data.accounts[0].broadcastEnabled, true);
   assert.equal(data.accounts[0].authflow, undefined);
   assert.equal(data.accounts[0].discovering, undefined);
   assert.ok(data.savedAt);

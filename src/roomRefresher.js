@@ -51,7 +51,8 @@ class RoomRefresher {
 
     this.running = (async () => {
       const startedAt = Date.now();
-      const accounts = this.auth.listAccounts();
+      const accounts = this.auth.listAccounts()
+        .filter((account) => account.broadcastEnabled === true);
       this.lastRunAt = startedAt;
 
       if (accounts.length === 0) {

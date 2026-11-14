@@ -115,6 +115,11 @@ button.secondary.danger {
   color: var(--danger);
 }
 
+button.broadcast-toggle.on {
+  border-color: rgba(87, 211, 140, 0.45);
+  color: var(--ok);
+}
+
 button.copy {
   padding: 0.25rem 0.6rem;
   font-size: 0.78rem;
